@@ -1,21 +1,29 @@
-const szam = Math.round(Math.random()*100)
-
-console.log("====================")
-console.log(`A véletlen szám: ${szam}`)
-console.log("====================")
-if(szam>=50){
-    console.log("Gratulálunk!")
-}
-else{
-    console.log("Sajnáljuk!")
-}
-console.log("====================")
-//rövidebben
-szam>=50 ? console.log("Ügyes vagy!") : console.log("Béna vagy!")
-console.log("====================")
-
-
-import { diakok } from "./adatok.js"
-
-console.log(`A diákok létszáma: ${diakok.length}`)
-console.log("====================")
+import express, { request } from 'express';
+ 
+import { diakok } from './data.js';
+ 
+const app = express();
+app.use(express.json());
+ 
+app.get('/',(request,response)=>{
+    //response.send('Saját szerverünk küldi ezt az üzenetet!')
+    response.send(diakok)
+})
+ 
+app.get('/:id',(request,response)=>{
+    const {id} = request.params
+    const filteredArr=diakok.filter(obj=>obj.id==id)
+    response.send(filteredArr)
+})
+ 
+app.post('/',(request,response)=>{
+    const {id,nev,osztaly}=request.body
+    diakok.push({id:id,nev:nev,osztaly:osztaly})
+    response.send(diakok)
+})
+ 
+app.get('*',(request,response)=>{
+    response.status(404).send('Az oldal nem létezik...')
+})
+ 
+app.listen(5000,() => console.log(`server listening on port 5000...`))
