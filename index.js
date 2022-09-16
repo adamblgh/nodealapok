@@ -1,5 +1,5 @@
 import { config } from "./dbconfig.js";
-import express  from "express";
+import express, { request, response }  from "express";
 import mysql from "mysql";
 
 const app = express()
@@ -44,5 +44,64 @@ app.get('/id/:id',(request,response)=>{
             response.send(result)
     })
 })
+
+app.put('/updateyear/:id/:year',(request,response)=>{
+    const {id,year} = request.params
+    db.query('UPDATE books SET year=? where id=?',[year,id],(err,result)=>{
+        if(err)
+            console.log(err)
+        if(result.affectedRows==1)
+            response.send({messege:"Sikeres adatmódosítás!"})
+        else
+            response.send({messege:"Sikertelen adatmódosítás!"})
+    })
+})
+
+app.put('/',(request,response)=>{
+    const {id,kat} = request.body
+    db.query('UPDATE books SET category=? where id=?',[kat,id],(err,result)=>{
+        if(err)
+            console.log(err)
+        if(result.affectedRows==1)
+            response.send({messege:"Sikeres adatmódosítás!"})
+        else
+            response.send({messege:"Sikertelen adatmódosítás!"})
+    })
+})
+
+app.post('/',(request,response)=>{
+    const {author,title,year,category} = request.body
+    db.query('INSERT INTO books VALUES (null,?,?,?,?)',[author,title,year,category],(err,result)=>{
+        if(err)
+            console.log(err)
+        if(result.insertId)
+            response.send({messege:`Sikeres adatmódosítás! ID: ${result.insertId}`})
+        else
+            response.send({messege:"Sikertelen adatmódosítás!"})
+    })
+})
+
+app.delete('/',(request,response)=>{
+    const {id} = request.body
+    db.query('DELETE from books where id=?;',[id],(err,result)=>{
+        if(err)
+            console.log(err)
+        if(result.affectedRows)
+            response.send({messege:`Sikeres adatmódosítás!`})
+        else
+            response.send({messege:"Sikertelen adatmódosítás!"})
+    })
+})
+
+app.get('/kategoria/:category',(request,response)=>{
+    const {category} = request.params
+    db.query('SELECT author,title from books where category=?',[category],(err,result)=>{
+        if(err)
+            console.log(err)
+        else    
+            response.send(result)
+    })
+})
+
 
 app.listen(5000,()=>console.log('server on port 5000...'))
